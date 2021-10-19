@@ -9,14 +9,10 @@
 	   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
-struct customer_info{ /// use this struct to record the customer information read from customers.txt
-    int user_id;
-	int class_type;
-	int service_time;
-	int arrival_time;
-};
+
 
 /* global variables */
+int NQUEQUE = 5;
  
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
