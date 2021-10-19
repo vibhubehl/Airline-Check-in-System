@@ -1,12 +1,17 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+
 /**
  Skeleton code of assignment 2 (For reference only)
 	   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
-
 struct customer_info{ /// use this struct to record the customer information read from customers.txt
     int user_id;
-	int class_type
+	int class_type;
 	int service_time;
 	int arrival_time;
 };
