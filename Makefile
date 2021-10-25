@@ -1,8 +1,8 @@
 .phony all:
-all: asc
+all: acs
 
 
-asc: ASC.c
+acs: ACS.c
 	gcc -Wall ACS.c -lreadline -o ACS -g
 
 
