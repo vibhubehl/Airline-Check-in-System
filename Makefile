@@ -3,7 +3,7 @@ all: asc
 
 
 asc: ASC.c
-	gcc -Wall ASC.c -lreadline -o ASC -g
+	gcc -Wall ACS.c -lreadline -o ACS -g
 
 
 .PHONY clean:
