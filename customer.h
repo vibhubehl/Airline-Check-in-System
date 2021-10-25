@@ -12,13 +12,13 @@
 //      arrival_time:   time it will spend with customer.
 //      next:            points to next in queque 
 */
-struct node{
+typedef struct node{
     int user_id;
 	int class_type;
 	int service_time;
 	int arrival_time;
-    node* next;
-};
+    struct node* next;
+} node;
 
 
 

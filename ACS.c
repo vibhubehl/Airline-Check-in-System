@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include "customer.h"
 
 /**
  Skeleton code of assignment 2 (For reference only)
@@ -12,7 +13,8 @@
 
 
 /* global variables */
-int NQUEQUE = 5;
+#define NQUEUE 5
+node* head=NULL;
  
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
@@ -35,18 +37,18 @@ int main() {
 
 	*/
 	//create clerk thread (optional)
-	for(i = 0, i < NClerks; i++){ // number of clerks
-		pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
-	}
+	// for(int i = 0, i < NClerks; i++){ // number of clerks
+	// 	pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
+	// }
 	
 	//create customer thread
-	for(i = 0, i < NCustomers; i++){ // number of customers
-		pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
-	}
+	// for(i = 0, i < NCustomers; i++){ // number of customers
+	// 	pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+	// }
 	// wait for all customer threads to terminate
-	forEach customer thread{
-		pthread_join(...);
-	}
+	// forEach customer thread{
+	// 	pthread_join(...);
+	// }
 	// destroy mutex & condition variable (optional)
 	
 	// calculate the average waiting time of all customers
@@ -55,62 +57,62 @@ int main() {
 
 // function entry for customer threads
 
-void * customer_entry(void * cus_info){
+// void * customer_entry(void * cus_info){
 	
-	struct customer_info * p_myInfo = (struct info_node *) cus_info;
+// 	struct customer_info * p_myInfo = (struct info_node *) cus_info;
 	
-	usleep(/* the arrival time of this customer */);
+// 	usleep(/* the arrival time of this customer */);
 	
-	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
+// 	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
 	
-	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
+// 	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
 	
-	pthread_mutex_lock(/* mutexLock of selected queue */);
+// 	pthread_mutex_lock(/* mutexLock of selected queue */);
 	
-	fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", /*...*/);
+// 	fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", /*...*/);
 
-	/* updates the queue_length, mutex_lock needed */
+// 	/* updates the queue_length, mutex_lock needed */
 	
-	pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
-	//Now pthread_cond_wait returned, customer was awoken by one of the clerks
+// 	pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
+// 	//Now pthread_cond_wait returned, customer was awoken by one of the clerks
 	
 	
-	pthread_mutex_unlock(/*mutexLock of selected queue*/); //unlock mutex_lock such that other customers can enter into the queue
+// 	pthread_mutex_unlock(/*mutexLock of selected queue*/); //unlock mutex_lock such that other customers can enter into the queue
 	
-	/* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
+// 	/* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
 	
-	/* get the current machine time; updates the overall_waiting_time*/
+// 	/* get the current machine time; updates the overall_waiting_time*/
 	
-	fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
+// 	fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
 	
-	usleep(/* as long as the service time of this customer */);
+// 	usleep(/* as long as the service time of this customer */);
 	
-	/* get the current machine time; */
-	fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
+// 	/* get the current machine time; */
+// 	fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
 	
-	pthread_cond_signal(/* The clerk awoken me */); // Notify the clerk that service is finished, it can serve another customer
+// 	pthread_cond_signal(/* The clerk awoken me */); // Notify the clerk that service is finished, it can serve another customer
 	
-	pthread_exit(NULL);
+// 	pthread_exit(NULL);
 	
-	return NULL;
-}
+// 	return NULL;
+// }
 
-// function entry for clerk threads
-void *clerk_entry(void * clerkNum){
+// // function entry for clerk threads
+// void *clerk_entry(void * clerkNum){
 	
-	while(TRUE){
-		// clerk is idle now
+// 	while(TRUE){
+// 		// clerk is idle now
 		
-		/* selected_queue_ID = Select the queue based on the priority and current customers number */	
+// 		/* selected_queue_ID = Select the queue based on the priority and current customers number */	
 		
-		pthread_mutex_lock(/* mutexLock of the selected queue */);
-		pthread_cond_broadcast(/* cond_var of the selected queue */); // Awake the customer (the one enter into the queue first) from the longest queue (notice the customer he can get served now)
-		pthread_mutex_unlock(/* mutexLock of the selected queue */);
+// 		pthread_mutex_lock(/* mutexLock of the selected queue */);
+// 		pthread_cond_broadcast(/* cond_var of the selected queue */); // Awake the customer (the one enter into the queue first) from the longest queue (notice the customer he can get served now)
+// 		pthread_mutex_unlock(/* mutexLock of the selected queue */);
 		
-		pthread_cond_wait(); // wait the customer to finish its service, clerk busy
-	}
+// 		pthread_cond_wait(); // wait the customer to finish its service, clerk busy
+// 	}
 	
-	pthread_exit(NULL);
+// 	pthread_exit(NULL);
 	
-	return NULL;
-}
+// 	return NULL;
+// }
