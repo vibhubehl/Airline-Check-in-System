@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
 
 	// get number of customers in file
 	int NCustomers = getNCustomers(fileName);
+
 	//create customer thread
 	for(i = 0; i < NCustomers; i++){ // number of customers
 		// pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
