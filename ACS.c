@@ -3,22 +3,22 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include "customer.h"
+#include "linkedList.h"
+#include "arguementParser.c"
 
-/**
- Skeleton code of assignment 2 (For reference only)
-	   
+/**   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
 
 
 /* global variables */
-#define NQUEUE 5
+// #define NQUEUE 5
+#define NClerks 5
 node* head=NULL;
  
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
-int queue_length[NQUEUE];// variable stores the real-time queue length information; mutex_lock needed
+// int queue_length[NQUEUE];// variable stores the real-time queue length information; mutex_lock needed
 
 /* Other global variable may include: 
  1. condition_variables (and the corresponding mutex_lock) to represent each queue; 
@@ -26,25 +26,31 @@ int queue_length[NQUEUE];// variable stores the real-time queue length informati
  3. others.. depend on your design
  */
 
-int main() {
+int main(int argc, char** argv) {
+	
+	// name of the file containing customer info
+	char* fileName = argv[1];
+	printf("filename is %s\n", fileName);
+	int i = 0;
 
 	// initialize all the condition variable and thread lock will be used
 	
-	/** Read customer information from txt file and store them in the structure you created 
-		
-		1. Allocate memory(array, link list etc.) to store the customer information.
-		2. File operation: fopen fread getline/gets/fread ..., store information in data structure you created
-
-	*/
-	//create clerk thread (optional)
-	// for(int i = 0, i < NClerks; i++){ // number of clerks
+	/** Read customer information from txt file and store them in the structure you created 	
+	// 	1. Allocate memory(array, link list etc.) to store the customer information.
+	// 	2. File operation: fopen fread getline/gets/fread ..., store information in data structure you created
+	// */
+	// fileExtractor(&head, fileName);
+	// create clerk thread (optional)
+	// for(int i = 0; i < NClerks; i++){ // number of clerks
 	// 	pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
 	// }
-	
+
+	// get number of customers in file
+	int NCustomers = getNCustomers(fileName);
 	//create customer thread
-	// for(i = 0, i < NCustomers; i++){ // number of customers
-	// 	pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
-	// }
+	for(i = 0; i < NCustomers; i++){ // number of customers
+		// pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+	}
 	// wait for all customer threads to terminate
 	// forEach customer thread{
 	// 	pthread_join(...);
