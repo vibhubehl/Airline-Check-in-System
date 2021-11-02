@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <unistd.h>  //intptr_t
+#include <unistd.h> 
 #include <time.h>
 
 /* create thread argument struct for thr_func() */

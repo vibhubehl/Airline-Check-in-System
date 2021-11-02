@@ -6,6 +6,7 @@
 #include "linkedList.h"
 #include "arguementParser.c"
 #include "errorGenerator.c"
+#include <pthread.h>
 /**   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
@@ -25,55 +26,6 @@ double overall_waiting_time; //A global variable to add up the overall waiting t
  2. condition_variables to represent clerks
  3. others.. depend on your design
  */
-
-int main(int argc, char** argv) {
-	// checking for invalid arguements
-	if(argc < 2){
-		errorGen(1);
-		exit(0);
-	}
-	else if(argc > 2){
-		errorGen(2);
-		exit(2);
-	}
-	// name of the file containing customer info
-	char* fileName = argv[1];
-	printf("filename is %s\n", fileName);
-	int i = 0;
-
-	// initialize all the condition variable and thread lock will be used
-	
-	/** Read customer information from txt file and store them in the structure you created 	
-	// 	1. Allocate memory(array, link list etc.) to store the customer information.
-	// 	2. File operation: fopen fread getline/gets/fread ..., store information in data structure you created
-	// */
-	// fileExtractor(&head, fileName);
-	// create clerk thread (optional)
-	// for(int i = 0; i < NClerks; i++){ // number of clerks
-	// 	pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
-	// }
-
-	// get number of customers in file
-	FILE *fptr = fopen(fileName, "r");
-	int NCustomers = getNCustomers(fptr);
-	pthread_t customId[NCustomers];
-
-	//create customer thread
-	for(i = 0; i < NCustomers; i++){ // number of customers
-		// defining new node that will added in threads
-		node* newNode = ( node*)malloc(sizeof(node));
-		initializeCustomers(&newNode, fptr);
-		// pthread_create(&customId[i], NULL, customer_entry, (void *)&newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
-	}
-	// wait for all customer threads to terminate
-	// forEach customer thread{
-	// 	pthread_join(...);
-	// }
-	// destroy mutex & condition variable (optional)
-	
-	// calculate the average waiting time of all customers
-	return 0;
-}
 
 // function entry for customer threads
 void * customer_entry(void * cus_info){
@@ -134,3 +86,54 @@ void * customer_entry(void * cus_info){
 	
 // 	return NULL;
 // }
+
+
+
+int main(int argc, char** argv) {
+	// checking for invalid arguements
+	if(argc < 2){
+		errorGen(1);
+		exit(0);
+	}
+	else if(argc > 2){
+		errorGen(2);
+		exit(2);
+	}
+	// name of the file containing customer info
+	char* fileName = argv[1];
+	printf("filename is %s\n", fileName);
+	int i = 0;
+
+	// initialize all the condition variable and thread lock will be used
+	
+	/** Read customer information from txt file and store them in the structure you created 	
+	// 	1. Allocate memory(array, link list etc.) to store the customer information.
+	// 	2. File operation: fopen fread getline/gets/fread ..., store information in data structure you created
+	// */
+	// fileExtractor(&head, fileName);
+	// create clerk thread (optional)
+	// for(int i = 0; i < NClerks; i++){ // number of clerks
+	// 	pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
+	// }
+
+	// get number of customers in file
+	FILE *fptr = fopen(fileName, "r");
+	int NCustomers = getNCustomers(fptr);
+	pthread_t customId[NCustomers];
+
+	//create customer thread
+	for(i = 0; i < NCustomers; i++){ // number of customers
+		// defining new node that will added in threads
+		node* newNode = ( node*)malloc(sizeof(node));
+		initializeCustomers(&newNode, fptr);
+		pthread_create(&customId[i], NULL, customer_entry, (void *)&newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+	}
+	// wait for all customer threads to terminate
+	// forEach customer thread{
+	// 	pthread_join(...);
+	// }
+	// destroy mutex & condition variable (optional)
+	
+	// calculate the average waiting time of all customers
+	return 0;
+}
