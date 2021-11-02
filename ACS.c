@@ -54,11 +54,16 @@ int main(int argc, char** argv) {
 	// }
 
 	// get number of customers in file
-	int NCustomers = getNCustomers(fileName);
+	FILE *fptr = fopen(fileName, "r");
+	int NCustomers = getNCustomers(fptr);
+	pthread_t customId[NCustomers];
 
 	//create customer thread
 	for(i = 0; i < NCustomers; i++){ // number of customers
-		// pthread_create(&customId[i], NULL, customer_entry, (void *)&custom_info[i]); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+		// defining new node that will added in threads
+		node* newNode = ( node*)malloc(sizeof(node));
+		initializeCustomers(&newNode, fptr);
+		// pthread_create(&customId[i], NULL, customer_entry, (void *)&newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
 	}
 	// wait for all customer threads to terminate
 	// forEach customer thread{
@@ -71,46 +76,44 @@ int main(int argc, char** argv) {
 }
 
 // function entry for customer threads
+void * customer_entry(void * cus_info){
+	struct node * p_myInfo = (struct node*) cus_info;
+	
+	// usleep(/* the arrival time of this customer */);
+	
+	// fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
+	
+	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
+	
+	// pthread_mutex_lock(/* mutexLock of selected queue */);
+	
+	// fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", /*...*/);
 
-// void * customer_entry(void * cus_info){
+	/* updates the queue_length, mutex_lock needed */
 	
-// 	struct customer_info * p_myInfo = (struct info_node *) cus_info;
-	
-// 	usleep(/* the arrival time of this customer */);
-	
-// 	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
-	
-// 	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
-	
-// 	pthread_mutex_lock(/* mutexLock of selected queue */);
-	
-// 	fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", /*...*/);
-
-// 	/* updates the queue_length, mutex_lock needed */
-	
-// 	pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
-// 	//Now pthread_cond_wait returned, customer was awoken by one of the clerks
+	// pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
+	//Now pthread_cond_wait returned, customer was awoken by one of the clerks
 	
 	
-// 	pthread_mutex_unlock(/*mutexLock of selected queue*/); //unlock mutex_lock such that other customers can enter into the queue
+	// pthread_mutex_unlock(/*mutexLock of selected queue*/); //unlock mutex_lock such that other customers can enter into the queue
 	
-// 	/* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
+	/* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
 	
-// 	/* get the current machine time; updates the overall_waiting_time*/
+	/* get the current machine time; updates the overall_waiting_time*/
 	
-// 	fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
+	// fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
 	
-// 	usleep(/* as long as the service time of this customer */);
+	// usleep(/* as long as the service time of this customer */);
 	
-// 	/* get the current machine time; */
-// 	fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
+	/* get the current machine time; */
+	// fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
 	
-// 	pthread_cond_signal(/* The clerk awoken me */); // Notify the clerk that service is finished, it can serve another customer
+	// pthread_cond_signal(/* The clerk awoken me */); // Notify the clerk that service is finished, it can serve another customer
 	
-// 	pthread_exit(NULL);
+	// pthread_exit(NULL);
 	
-// 	return NULL;
-// }
+	return NULL;
+}
 
 // // function entry for clerk threads
 // void *clerk_entry(void * clerkNum){
