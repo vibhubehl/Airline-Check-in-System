@@ -3,7 +3,7 @@ all: acs
 
 
 acs: ACS.c
-	gcc -Wall ACS.c -lreadline -o ACS -g
+	gcc -Wall -pthread ACS.c -lreadline -o ACS -g
 
 
 .PHONY clean:

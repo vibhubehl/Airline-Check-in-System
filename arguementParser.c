@@ -6,14 +6,14 @@
 //      2)  fprt:       pointer to the line which has to initialized
 */
 void initializeCustomers(node** newNode, FILE* fptr){
-    printf("entering\n");
     char line[20];
     // number in firstline indicates length of the file
     fscanf(fptr, "%s", line);
-    char * token = strtok(line, ":");
-    (*newNode)->class_type = strtok(NULL, ",");
+    strtok(line, ":");
+    (*newNode)->class_type = atoi(strtok(NULL, ","));
     (*newNode)->arrival_time = atoi(strtok(NULL, ","));
     (*newNode)->service_time = atoi(strtok(NULL, ","));
+    (*newNode)->next = NULL;
 }
 
 

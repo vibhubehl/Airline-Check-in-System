@@ -6,7 +6,6 @@
 #include "linkedList.h"
 #include "arguementParser.c"
 #include "errorGenerator.c"
-#include <pthread.h>
 /**   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
