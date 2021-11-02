@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <string.h>
@@ -99,7 +100,6 @@ int main(int argc, char** argv) {
 	}
 	// name of the file containing customer info
 	char* fileName = argv[1];
-	printf("filename is %s\n", fileName);
 	int i = 0;
 
 	// initialize all the condition variable and thread lock will be used
@@ -113,9 +113,16 @@ int main(int argc, char** argv) {
 	// for(int i = 0; i < NClerks; i++){ // number of clerks
 	// 	pthread_create(&clerkId[i], NULL, clerk_entry, (void *)&clerk_info[i]); // clerk_info: passing the clerk information (e.g., clerk ID) to clerk thread
 	// }
-
+	FILE *fptr;
 	// get number of customers in file
-	FILE *fptr = fopen(fileName, "r");
+	if( fopen(fileName, "r")){
+		fptr = fopen(fileName, "r");
+	}
+	else{
+		errorGen(3);
+		exit(3);
+	}
+	
 	int NCustomers = getNCustomers(fptr);
 	pthread_t customId[NCustomers];
 

@@ -15,5 +15,8 @@ void errorGen(int errorCode){
         case 2:
             perror("Invalid number of arguements. Try Again.");
             break;
+        case 3:
+            perror("Try Again.");
+            break;
     }
 }
