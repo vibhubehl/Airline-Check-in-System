@@ -9,7 +9,7 @@ void initializeCustomers(node** newNode, FILE* fptr){
     char line[20];
     // number in firstline indicates length of the file
     fscanf(fptr, "%s", line);
-    strtok(line, ":");
+    (*newNode)->user_id = atoi(strtok(line, ":"));
     (*newNode)->class_type = atoi(strtok(NULL, ","));
     (*newNode)->arrival_time = atoi(strtok(NULL, ","));
     (*newNode)->service_time = atoi(strtok(NULL, ","));
