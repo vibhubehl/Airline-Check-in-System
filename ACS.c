@@ -19,7 +19,7 @@ int NBuisnessQueQue = 0;
 int NEconomyQueQue = 0;
 node* buisnessHead=NULL;
 node* econonmyHead=NULL;
-pthread_mutex_t quequeMutex;
+pthread_mutex_t quequeMutex[2];
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
 // int queue_length[NQUEUE];// variable stores the real-time queue length information; mutex_lock needed
@@ -39,7 +39,7 @@ void * customer_entry(void * cus_info){
 	printf("before\n");
 
 	// quequeMutex must be locked before using the queque
-	pthread_mutex_lock(&quequeMutex);
+	pthread_mutex_lock(&quequeMutex[p_myInfo->class_type]);
 	{
 		
 		/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
@@ -56,8 +56,8 @@ void * customer_entry(void * cus_info){
 		}
 
 		while (1) {
-			pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
-			if ((econonmyHead == p_myInfo) && (buisnessHead == p_myInfo) && !winner_selected[cur_queue]) {
+			// pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
+			if ((econonmyHead == p_myInfo) && (buisnessHead == p_myInfo) /*&& !winner_selected[cur_queue]*/) {
 				// deQueue();
 				// queue_length[cur_queue]--;
 				// winner_selected[cur_queue] = TRUE; // update the winner_selected variable to indicate that the first customer has been selected from the queue
@@ -66,7 +66,7 @@ void * customer_entry(void * cus_info){
 		}
 	}
 	// queque available for other threads
-	pthread_mutex_unlock(&quequeMutex);
+	pthread_mutex_unlock(&quequeMutex[p_myInfo->class_type]);
 	printf("after\n");
 
 	// /* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
@@ -85,24 +85,28 @@ void * customer_entry(void * cus_info){
 	
 	// pthread_cond_signal(/* convar of the clerk signaled me */); // Notify the clerk that service is finished, it can serve another customer
 	
-	// pthread_exit(NULL);
-	
-	// return NULL;
+	pthread_exit(NULL);
+	return NULL;
 }
 
-// // function entry for clerk threads
+// function entry for clerk threads
 // void *clerk_entry(void * clerkNum){
 	
 // 	while(TRUE){
-// 		// clerk is idle now
 		
-// 		/* selected_queue_ID = Select the queue based on the priority and current customers number */	
+// 		/* selected_queue_ID = Select the queue based on the priority and current customers number */
 		
 // 		pthread_mutex_lock(/* mutexLock of the selected queue */);
-// 		pthread_cond_broadcast(/* cond_var of the selected queue */); // Awake the customer (the one enter into the queue first) from the longest queue (notice the customer he can get served now)
+		
+// 		queue_status[selected_queue_ID] = clerkID; // The current clerk (clerkID) is signaling this queue
+		
+// 		pthread_cond_broadcast(/* cond_var of the selected queue */); // Awake the customer (the one enter into the queue first) from the selected queue
+		
+// 		winner_selected[selected_queue_ID] = FALSE; // set the initial value as the customer has not selected from the queue.
+		
 // 		pthread_mutex_unlock(/* mutexLock of the selected queue */);
 		
-// 		pthread_cond_wait(); // wait the customer to finish its service, clerk busy
+// 		pthread_cond_wait(/* convar of the current clerk */); // wait for the customer to finish its service
 // 	}
 	
 // 	pthread_exit(NULL);
