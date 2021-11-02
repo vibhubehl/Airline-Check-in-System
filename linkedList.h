@@ -27,19 +27,11 @@ typedef struct node{
 // 		1)	head:       head of the linked list
 //      2)  newNode:    new node to be added.
 */
-void add_to_queque( int user_id, int class_type, int service_time, int arrival_time, node** head){
-
-    // defining new node that has to be added to the queque
-    node* newNode=( node*)malloc(sizeof(node));
-    newNode->user_id=user_id;
-	newNode->class_type=class_type;
-    newNode->service_time=service_time;
-    newNode->arrival_time=arrival_time;
-    newNode->next = NULL;
+void add_to_queque( node** newNode, node** head){
 
     // list is empty
     if(*head == NULL){
-        *head = newNode;
+        *head = *newNode;
     }
     else{
         node* curr = *head;
@@ -48,6 +40,6 @@ void add_to_queque( int user_id, int class_type, int service_time, int arrival_t
             curr = curr->next;
         }
         // set newNode to the last node of linked list
-        curr->next=newNode;
+        curr->next=*newNode;
     }
 }

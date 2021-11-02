@@ -15,8 +15,11 @@
 /* global variables */
 // #define NQUEUE 5
 #define NClerks 5
-node* head=NULL;
- 
+int NBuisnessQueQue = 0;
+int NEconomyQueQue = 0;
+node* buisnessHead=NULL;
+node* econonmyHead=NULL;
+pthread_mutex_t quequeMutex;
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
 // int queue_length[NQUEUE];// variable stores the real-time queue length information; mutex_lock needed
@@ -33,12 +36,24 @@ void * customer_entry(void * cus_info){
 	// wait till arrival times occur
 	usleep(p_myInfo->arrival_time);
 	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
+	printf("before\n");
+
+	// quequeMutex must be locked before using the queque
+	pthread_mutex_lock(&quequeMutex);
 	
 	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
-	
-	// pthread_mutex_lock(/* mutexLock of selected queue */);
-	
-	// fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", /*...*/);
+	// check if customer is buisness or economy
+	if(p_myInfo->class_type == 0){
+		add_to_queque(&p_myInfo, &econonmyHead);
+		NEconomyQueQue++;
+		fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", p_myInfo->class_type, NEconomyQueQue);
+	}
+	else{
+		add_to_queque(&p_myInfo, &buisnessHead);
+		NBuisnessQueQue++;
+		fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", p_myInfo->class_type, NBuisnessQueQue);
+	}
+	printf("after\n");
 
 	/* updates the queue_length, mutex_lock needed */
 	
@@ -132,6 +147,7 @@ int main(int argc, char** argv) {
 		node* newNode = ( node*)malloc(sizeof(node));
 		initializeCustomers(&newNode, fptr);
 		pthread_create(&customId[i], NULL, customer_entry, (void *)&newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+		pthread_join(customId[i], NULL);
 	}
 	// wait for all customer threads to terminate
 	// forEach customer thread{
