@@ -35,50 +35,59 @@ void * customer_entry(void * cus_info){
 	struct node * p_myInfo = (struct node*) cus_info;
 	// wait till arrival times occur
 	usleep(p_myInfo->arrival_time);
-	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
+	fprintf(stdout, "A customer arrives: customer ID %d. \n", p_myInfo->user_id);
 	printf("before\n");
 
 	// quequeMutex must be locked before using the queque
 	pthread_mutex_lock(&quequeMutex);
-	
-	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
-	// check if customer is buisness or economy
-	if(p_myInfo->class_type == 0){
-		add_to_queque(&p_myInfo, &econonmyHead);
-		NEconomyQueQue++;
-		fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", p_myInfo->class_type, NEconomyQueQue);
+	{
+		
+		/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
+		// check if customer is buisness or economy
+		if(p_myInfo->class_type == 0){
+			add_to_queque(&p_myInfo, &econonmyHead);
+			NEconomyQueQue++;
+			fprintf(stdout, "A customer enters a queue: the queue ID %d, and length of the queue %d. \n", p_myInfo->class_type, NEconomyQueQue);
+		}
+		else{
+			add_to_queque(&p_myInfo, &buisnessHead);
+			NBuisnessQueQue++;
+			fprintf(stdout, "A customer enters a queue: the queue ID %d, and length of the queue %d. \n", p_myInfo->class_type, NBuisnessQueQue);
+		}
+
+		while (1) {
+			pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
+			if ((econonmyHead == p_myInfo) && (buisnessHead == p_myInfo) && !winner_selected[cur_queue]) {
+				// deQueue();
+				// queue_length[cur_queue]--;
+				// winner_selected[cur_queue] = TRUE; // update the winner_selected variable to indicate that the first customer has been selected from the queue
+				// break;
+			}
+		}
 	}
-	else{
-		add_to_queque(&p_myInfo, &buisnessHead);
-		NBuisnessQueQue++;
-		fprintf(stdout, "A customer enters a queue: the queue ID %1d, and length of the queue %2d. \n", p_myInfo->class_type, NBuisnessQueQue);
-	}
+	// queque available for other threads
+	pthread_mutex_unlock(&quequeMutex);
 	printf("after\n");
 
-	/* updates the queue_length, mutex_lock needed */
+	// /* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
+	// usleep(10); // Add a usleep here to make sure that all the other waiting threads have already got back to call pthread_cond_wait. 10 us will not harm your simulation time.
+	// clerk_woke_me_up = queue_status[cur_queue];
+	// queue_status[cur_queue] = IDLE;
 	
-	// pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
-	//Now pthread_cond_wait returned, customer was awoken by one of the clerks
-	
-	
-	// pthread_mutex_unlock(/*mutexLock of selected queue*/); //unlock mutex_lock such that other customers can enter into the queue
-	
-	/* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
-	
-	/* get the current machine time; updates the overall_waiting_time*/
+	// /* get the current machine time; updates the overall_waiting_time*/
 	
 	// fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
 	
 	// usleep(/* as long as the service time of this customer */);
 	
-	/* get the current machine time; */
+	// /* get the current machine time; */
 	// fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
 	
-	// pthread_cond_signal(/* The clerk awoken me */); // Notify the clerk that service is finished, it can serve another customer
+	// pthread_cond_signal(/* convar of the clerk signaled me */); // Notify the clerk that service is finished, it can serve another customer
 	
 	// pthread_exit(NULL);
 	
-	return NULL;
+	// return NULL;
 }
 
 // // function entry for clerk threads
@@ -146,7 +155,7 @@ int main(int argc, char** argv) {
 		// defining new node that will added in threads
 		node* newNode = ( node*)malloc(sizeof(node));
 		initializeCustomers(&newNode, fptr);
-		pthread_create(&customId[i], NULL, customer_entry, (void *)&newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
+		pthread_create(&customId[i], NULL, customer_entry, (void *)newNode); //custom_info: passing the customer information (e.g., customer ID, arrival time, service time, etc.) to customer thread
 		pthread_join(customId[i], NULL);
 	}
 	// wait for all customer threads to terminate
