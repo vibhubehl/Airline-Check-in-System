@@ -29,10 +29,9 @@ double overall_waiting_time; //A global variable to add up the overall waiting t
 // function entry for customer threads
 void * customer_entry(void * cus_info){
 	struct node * p_myInfo = (struct node*) cus_info;
-	
-	// usleep(/* the arrival time of this customer */);
-	
-	// fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
+	// wait till arrival times occur
+	usleep(p_myInfo->arrival_time);
+	fprintf(stdout, "A customer arrives: customer ID %2d. \n", p_myInfo->user_id);
 	
 	/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
 	
