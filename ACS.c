@@ -5,7 +5,7 @@
 #include <time.h>
 #include "linkedList.h"
 #include "arguementParser.c"
-
+#include "errorGenerator.c"
 /**   
  The time calculation could be confusing, check the exmaple of gettimeofday on tutorial for more detail.
  */
@@ -27,7 +27,15 @@ double overall_waiting_time; //A global variable to add up the overall waiting t
  */
 
 int main(int argc, char** argv) {
-	
+	// checking for invalid arguements
+	if(argc < 2){
+		errorGen(1);
+		exit(0);
+	}
+	else if(argc > 2){
+		errorGen(2);
+		exit(2);
+	}
 	// name of the file containing customer info
 	char* fileName = argv[1];
 	printf("filename is %s\n", fileName);
