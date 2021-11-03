@@ -43,3 +43,53 @@ void add_to_queque( node** newNode, node** head){
         curr->next=*newNode;
     }
 }
+
+
+/*
+// Description:	deletes the node that has the given PID
+// Parameter:
+// 		1)	cust_id:    id of the node that has to be deleted.
+//      2)  head:       head of the linked list.
+*/
+int removeUsingId(int cust_id, node** head){
+
+    // list is empty
+    if(*head == NULL){
+        return -1;
+    }
+    else{
+        node* curr = *head;
+        node** prev = NULL;
+        while(curr->next != NULL && curr->user_id != cust_id){
+            // iterate to find cust_id
+            *prev = curr;
+            curr = curr->next;
+        }
+        if(curr->user_id == cust_id){
+            // remove curr
+            node** next = &(curr->next);
+            // deleting head
+            if(prev == NULL){
+                // head is the only element in list
+                if(*next == NULL){
+                    *head = NULL;
+                }
+                // change head to second element
+                else{
+                    *head = *next;
+                }
+            }
+            else{
+                (*prev)->next=*next;
+            }
+            free(curr);
+            return 0;
+        }
+        else{
+            // not found
+            return -1;
+        }
+    }
+    // successful deletetion
+    return 0;
+}
