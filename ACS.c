@@ -16,8 +16,11 @@
 // #define NQUEUE 5
 #define NClerks 5
 #define NQueque 2
+#define IDLE -1
+
 int NBuisnessQueQue = 0;
 int NEconomyQueQue = 0;
+int queue_status[2];
 node* heads[2];
 node* econonmyHead=NULL;
 pthread_mutex_t quequeMutex[NQueque];
@@ -54,9 +57,7 @@ void * customer_entry(void * cus_info){
 
 		while (1) {
 			pthread_cond_wait(&isClerkFree, &quequeMutex[cur_queue]);
-			// printf("after1\n");
 			if ((heads[cur_queue] == p_myInfo) && !winner_selected[cur_queue]) {
-				// printf("after2\n");
 				removeUsingId(p_myInfo->user_id, &heads[cur_queue]);
 				queue_length[cur_queue]--;
 				winner_selected[cur_queue] = true; // update the winner_selected variable to indicate that the first customer has been selected from the queue
@@ -66,23 +67,23 @@ void * customer_entry(void * cus_info){
 	}
 	// queque available for other threads
 	pthread_mutex_unlock(&quequeMutex[cur_queue]);
-	printf("after\n");
 
 	// /* Try to figure out which clerk awoken me, because you need to print the clerk Id information */
-	// usleep(10); // Add a usleep here to make sure that all the other waiting threads have already got back to call pthread_cond_wait. 10 us will not harm your simulation time.
-	// clerk_woke_me_up = queue_status[cur_queue];
-	// queue_status[cur_queue] = IDLE;
+	usleep(10); // Add a usleep here to make sure that all the other waiting threads have already got back to call pthread_cond_wait. 10 us will not harm your simulation time.
+	int clerk_woke_me_up = queue_status[cur_queue];
+	queue_status[cur_queue] = IDLE;
 	
 	// /* get the current machine time; updates the overall_waiting_time*/
 	
+	
 	// fprintf(stdout, "A clerk starts serving a customer: start time %.2f, the customer ID %2d, the clerk ID %1d. \n", /*...*/);
 	
-	// usleep(/* as long as the service time of this customer */);
+	usleep(p_myInfo->service_time);
 	
 	// /* get the current machine time; */
 	// fprintf(stdout, "A clerk finishes serving a customer: end time %.2f, the customer ID %2d, the clerk ID %1d. \n", /* ... */);\
 	
-	// pthread_cond_signal(/* convar of the clerk signaled me */); // Notify the clerk that service is finished, it can serve another customer
+	pthread_cond_signal(&isClerkFree); // Notify the clerk that service is finished, it can serve another customer
 	
 	pthread_exit(NULL);
 	return NULL;
@@ -132,6 +133,8 @@ int main(int argc, char** argv) {
 	queue_length[1] = false;
 	heads[0]=NULL;
 	heads[1]=NULL;
+	queue_status[0] = IDLE;
+	queue_status[1] = IDLE;
 
 	// initialize all the condition variable and thread lock will be used
 	
