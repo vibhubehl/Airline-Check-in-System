@@ -15,14 +15,18 @@
 /* global variables */
 // #define NQUEUE 5
 #define NClerks 5
+#define NQueque 2
 int NBuisnessQueQue = 0;
 int NEconomyQueQue = 0;
 node* buisnessHead=NULL;
 node* econonmyHead=NULL;
-pthread_mutex_t quequeMutex[2];
+pthread_mutex_t quequeMutex[NQueque];
+pthread_cond_t isClerkFree;
 struct timeval init_time; // use this variable to record the simulation start time; No need to use mutex_lock when reading this variable since the value would not be changed by thread once the initial time was set.
 double overall_waiting_time; //A global variable to add up the overall waiting time for all customers, every customer add their own waiting time to this variable, mutex_lock is necessary.
-// int queue_length[NQUEUE];// variable stores the real-time queue length information; mutex_lock needed
+int winner_selected[NQueque];
+int queue_length[NQueque];// variable stores the real-time queue length information; mutex_lock needed
+
 
 /* Other global variable may include: 
  1. condition_variables (and the corresponding mutex_lock) to represent each queue; 
@@ -33,18 +37,19 @@ double overall_waiting_time; //A global variable to add up the overall waiting t
 // function entry for customer threads
 void * customer_entry(void * cus_info){
 	struct node * p_myInfo = (struct node*) cus_info;
+	int cur_queue = p_myInfo->class_type;
 	// wait till arrival times occur
 	usleep(p_myInfo->arrival_time);
 	fprintf(stdout, "A customer arrives: customer ID %d. \n", p_myInfo->user_id);
 	printf("before\n");
 
 	// quequeMutex must be locked before using the queque
-	pthread_mutex_lock(&quequeMutex[p_myInfo->class_type]);
+	pthread_mutex_lock(&quequeMutex[cur_queue]);
 	{
 		
 		/* Enqueue operation: get into either business queue or economy queue by using p_myInfo->class_type*/
 		// check if customer is buisness or economy
-		if(p_myInfo->class_type == 0){
+		if(cur_queue == 0){
 			add_to_queque(&p_myInfo, &econonmyHead);
 			NEconomyQueQue++;
 			fprintf(stdout, "A customer enters a queue: the queue ID %d, and length of the queue %d. \n", p_myInfo->class_type, NEconomyQueQue);
@@ -56,8 +61,8 @@ void * customer_entry(void * cus_info){
 		}
 
 		while (1) {
-			// pthread_cond_wait(/* cond_var of selected queue */, /* mutexLock of selected queue */);
-			if ((econonmyHead == p_myInfo) && (buisnessHead == p_myInfo) /*&& !winner_selected[cur_queue]*/) {
+			pthread_cond_wait(&isClerkFree, &quequeMutex[cur_queue]);
+			if ((econonmyHead == p_myInfo) && (buisnessHead == p_myInfo) && !winner_selected[cur_queue]) {
 				// deQueue();
 				// queue_length[cur_queue]--;
 				// winner_selected[cur_queue] = TRUE; // update the winner_selected variable to indicate that the first customer has been selected from the queue
@@ -129,6 +134,8 @@ int main(int argc, char** argv) {
 	// name of the file containing customer info
 	char* fileName = argv[1];
 	int i = 0;
+	queue_length[0] = 0;
+	queue_length[1] = 1;
 
 	// initialize all the condition variable and thread lock will be used
 	
