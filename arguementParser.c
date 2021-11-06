@@ -14,7 +14,7 @@ void initializeCustomers(node** newNode, FILE* fptr){
     (*newNode)->arrival_time = atoi(strtok(NULL, ","));
     (*newNode)->service_time = atoi(strtok(NULL, ","));
     (*newNode)->next = NULL;
-}
+  }
 
 
 

@@ -27,11 +27,11 @@ typedef struct node{
 // 		1)	head:       head of the linked list
 //      2)  newNode:    new node to be added.
 */
-void add_to_queque( node** newNode, node** head){
+void add_to_queque( node* newNode, node** head){
 
     // list is empty
     if(*head == NULL){
-        *head = *newNode;
+        *head = newNode;
     }
     else{
         node* curr = *head;
@@ -40,7 +40,7 @@ void add_to_queque( node** newNode, node** head){
             curr = curr->next;
         }
         // set newNode to the last node of linked list
-        curr->next=*newNode;
+        curr->next=newNode;
     }
 }
 
@@ -51,45 +51,49 @@ void add_to_queque( node** newNode, node** head){
 // 		1)	cust_id:    id of the node that has to be deleted.
 //      2)  head:       head of the linked list.
 */
-int removeUsingId(int cust_id, node** head){
+void removeUsingId(int cust_id, node** head){
 
-    // list is empty
-    if(*head == NULL){
-        return -1;
+    //start from the first link
+    struct node* current = *head;
+    struct node* previous = NULL;
+        
+    //if list is empty
+    if(*head == NULL) {
+        return;
     }
-    else{
-        node* curr = *head;
-        node** prev = NULL;
-        while(curr->next != NULL && curr->user_id != cust_id){
-            // iterate to find cust_id
-            *prev = curr;
-            curr = curr->next;
-        }
-        if(curr->user_id == cust_id){
-            // remove curr
-            node** next = &(curr->next);
-            // deleting head
-            if(prev == NULL){
-                // head is the only element in list
-                if(*next == NULL){
-                    *head = NULL;
-                }
-                // change head to second element
-                else{
-                    *head = *next;
-                }
-            }
-            else{
-                (*prev)->next=*next;
-            }
-            free(curr);
-            return 0;
-        }
-        else{
-            // not found
-            return -1;
+
+    //navigate through list
+    while(current->user_id != cust_id) {
+
+        //if it is last node
+        if(current->next == NULL) {
+            return;
+        } else {
+            //store reference to current link
+            previous = current;
+            //move to next link
+            current = current->next;
         }
     }
-    // successful deletetion
-    return 0;
+
+    //found a match, update the link
+    if(current->user_id == (*head)->user_id) {
+        //change first to point to next link
+        *head = (*head)->next;
+    } else {
+        //bypass the current link
+        previous->next = current->next;
+    }    
+        
+}
+
+
+void displayLinkedList(node** head, int NQueque){
+    node* curr = *head;
+    printf("linked list is:");
+    for(int i=0; i < NQueque; i++){
+        printf("%d, ",  curr->user_id);
+        curr=curr->next;
+    }
+    printf("\n");
 }
